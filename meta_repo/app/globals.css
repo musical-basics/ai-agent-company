@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════
+   SWARM FORGE — Design System
+   "Visual IDE for Capitalism"
+═══════════════════════════════════════════════ */
+
+:root {
+  /* Core palette */
+  --bg-base:        #080b14;
+  --bg-surface:     #0d1120;
+  --bg-elevated:    #131927;
+  --bg-panel:       #0f1524;
+  --bg-card:        #141c2e;
+  --bg-hover:       #1a2236;
+
+  /* Borders */
+  --border-subtle:  #1e2a40;
+  --border-medium:  #243249;
+  --border-strong:  #2d3f60;
+
+  /* Text */
+  --text-primary:   #e8eef8;
+  --text-secondary: #8fa4c0;
+  --text-muted:     #4a6080;
+  --text-dim:       #2d4060;
+
+  /* Accent — Electric Indigo */
+  --accent:         #6366f1;
+  --accent-bright:  #818cf8;
+  --accent-dim:     #3730a3;
+  --accent-glow:    rgba(99,102,241,0.25);
+
+  /* Emerald (success/deploy) */
+  --emerald:        #10b981;
+  --emerald-dim:    #064e3b;
+  --emerald-glow:   rgba(16,185,129,0.2);
+
+  /* Amber (warning/SLA) */
+  --amber:          #f59e0b;
+  --amber-dim:      #451a03;
+
+  /* Rose (danger/escalation) */
+  --rose:           #f43f5e;
+  --rose-dim:       #4c0519;
+
+  /* Cyan (tool/integration) */
+  --cyan:           #06b6d4;
+  --cyan-dim:       #083344;
+  --cyan-glow:      rgba(6,182,212,0.2);
+
+  /* Violet (manager) */
+  --violet:         #8b5cf6;
+  --violet-dim:     #2e1065;
+  --violet-glow:    rgba(139,92,246,0.2);
+
+  /* Node colors */
+  --node-worker:    #6366f1;
+  --node-manager:   #8b5cf6;
+  --node-tool:      #06b6d4;
+  --node-adapter:   #f59e0b;
+  --node-ceo:       #f43f5e;
+}
+
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ─── React Flow overrides ─── */
+.react-flow__background { background: var(--bg-base); }
+.react-flow__background-pattern { stroke: var(--border-subtle); }
+
+.react-flow__controls {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+.react-flow__controls-button {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.react-flow__controls-button:hover { background: var(--bg-hover); color: var(--text-primary); }
+.react-flow__controls-button:last-child { border-bottom: none; }
+.react-flow__controls-button svg { fill: currentColor; width: 12px; height: 12px; }
+
+.react-flow__minimap {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.react-flow__edge-path { stroke-width: 2; }
+.react-flow__edge.selected .react-flow__edge-path { stroke: var(--accent-bright); }
+
+.react-flow__handle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-elevated);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.react-flow__handle:hover {
+  transform: scale(1.4);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+.react-flow__handle-left  { background: var(--accent); left: -5px; }
+.react-flow__handle-right { background: var(--accent); right: -5px; }
+
+/* ─── Glass panel utility ─── */
+.glass {
+  background: rgba(13, 17, 32, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-medium);
+}
+
+/* ─── Glow utilities ─── */
+.glow-accent  { box-shadow: 0 0 20px var(--accent-glow); }
+.glow-emerald { box-shadow: 0 0 20px var(--emerald-glow); }
+.glow-cyan    { box-shadow: 0 0 20px var(--cyan-glow); }
+.glow-violet  { box-shadow: 0 0 20px var(--violet-glow); }
+
+/* ─── Animations ─── */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-fade-in  { animation: fadeSlideIn 0.25s ease forwards; }
+.animate-pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 3s linear infinite; }
+
+/* ─── Drag ghost ─── */
+.dragging-ghost {
+  opacity: 0.6;
+  box-shadow: 0 8px 32px rgba(99,102,241,0.4);
+  border: 1px solid var(--accent);
+}
+
+/* ─── YAML code block ─── */
+.yaml-block {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  color: var(--text-secondary);
+  white-space: pre;
+}
+.yaml-block .yaml-key    { color: var(--accent-bright); }
+.yaml-block .yaml-value  { color: var(--emerald); }
+.yaml-block .yaml-comment{ color: var(--text-muted); }
