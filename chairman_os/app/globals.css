@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════
+   CHAIRMAN OS — War Room Design System
+   "You are no longer coding. You are managing."
+═══════════════════════════════════════════════ */
+
+:root {
+  /* Core surfaces */
+  --bg-base:        #05080f;
+  --bg-surface:     #080d18;
+  --bg-elevated:    #0c1220;
+  --bg-panel:       #0a1019;
+  --bg-card:        #0e1525;
+  --bg-hover:       #111d30;
+
+  /* Borders */
+  --border-subtle:  #111e33;
+  --border-medium:  #182540;
+  --border-strong:  #1f3050;
+
+  /* Text */
+  --text-primary:   #dde8f5;
+  --text-secondary: #7a96b8;
+  --text-muted:     #3d5470;
+  --text-dim:       #1e3050;
+
+  /* Accent — Electric Cyan (command center feel) */
+  --accent:         #00d4ff;
+  --accent-dim:     #003d4d;
+  --accent-glow:    rgba(0,212,255,0.15);
+  --accent-text:    #00b8e0;
+
+  /* Status colors */
+  --green:          #00e5a0;
+  --green-dim:      #002918;
+  --green-glow:     rgba(0,229,160,0.15);
+
+  --amber:          #ffb300;
+  --amber-dim:      #2a1f00;
+  --amber-glow:     rgba(255,179,0,0.15);
+
+  --red:            #ff3d5a;
+  --red-dim:        #2a0010;
+  --red-glow:       rgba(255,61,90,0.15);
+
+  --violet:         #9d6ff0;
+  --violet-dim:     #1a0d33;
+
+  /* Agent type colors */
+  --agent-ceo:      #ff3d5a;
+  --agent-manager:  #9d6ff0;
+  --agent-worker:   #00d4ff;
+  --agent-tool:     #00e5a0;
+
+  /* Event status colors */
+  --status-pending:   #ffb300;
+  --status-delivered: #00e5a0;
+  --status-rejected:  #ff3d5a;
+  --status-flagged:   #ff7c3a;
+  --status-replayed:  #9d6ff0;
+  --status-processing:#00d4ff;
+
+  /* Sidebar width */
+  --sidebar-w: 240px;
+}
+
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbars ─── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+/* ─── Animations ─── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeSlideRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulseRing {
+  0%   { box-shadow: 0 0 0 0 rgba(0,229,160,0.4); }
+  70%  { box-shadow: 0 0 0 6px rgba(0,229,160,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,229,160,0); }
+}
+@keyframes scanline {
+  from { background-position: 0 0; }
+  to   { background-position: 0 100%; }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position: 200% center; }
+}
+
+.animate-fade-up     { animation: fadeSlideUp 0.25s ease forwards; }
+.animate-fade-right  { animation: fadeSlideRight 0.3s ease forwards; }
+.animate-pulse-ring  { animation: pulseRing 1.8s ease-out infinite; }
+.animate-blink       { animation: blink 1.2s step-start infinite; }
+.animate-spin-slow   { animation: spinSlow 2s linear infinite; }
+
+/* ─── Live indicator dot ─── */
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulseRing 1.8s ease-out infinite;
+  display: inline-block;
+}
+
+/* ─── Status badge ─── */
+.status-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.status-pending    { background: var(--amber-dim);  color: var(--amber);  border: 1px solid #ffb30030; }
+.status-delivered  { background: var(--green-dim);  color: var(--green);  border: 1px solid #00e5a030; }
+.status-rejected   { background: var(--red-dim);    color: var(--red);    border: 1px solid #ff3d5a30; }
+.status-flagged    { background: #2a1505;            color: #ff7c3a;       border: 1px solid #ff7c3a30; }
+.status-replayed   { background: var(--violet-dim); color: var(--violet); border: 1px solid #9d6ff030; }
+.status-processing { background: var(--accent-dim); color: var(--accent); border: 1px solid #00d4ff30; }
+
+/* ─── Agent avatar chip ─── */
+.agent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px 2px 2px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* ─── Code / artifact blocks ─── */
+.artifact-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.65;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 14px;
+  overflow-x: auto;
+  color: var(--text-secondary);
+  white-space: pre;
+}
+
+/* ─── Diff viewer ─── */
+.diff-add { background: #001f1466; color: #00e5a0; display: block; padding: 0 8px; }
+.diff-del { background: #1f000866; color: #ff3d5a; display: block; padding: 0 8px; text-decoration: line-through; }
+.diff-ctx { color: var(--text-muted); display: block; padding: 0 8px; }
+
+/* ─── Channel item ─── */
+.channel-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: background 0.12s, color 0.12s;
+}
+.channel-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.channel-item.active { background: var(--accent-dim); color: var(--accent); }
+
+/* ─── War room scanline overlay (subtle) ─── */
+.scanline-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
