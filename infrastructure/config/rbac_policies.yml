@@ -1,0 +1,146 @@
+# ══════════════════════════════════════════════════════════════════
+#  RBAC POLICIES — Role-Based Access Control
+#  Maps agents to the specific tools they are authorized to use.
+#  The Worker Orchestrator checks this before allowing any
+#  tool execution requested by the LLM Spirit.
+# ══════════════════════════════════════════════════════════════════
+
+version: "1.0"
+
+# ── Available Tools (The Nervous System) ──
+# Each tool has a unique ID and a risk classification.
+
+tool_definitions:
+
+  - id: google_ads_api
+    display_name: "Google Ads API"
+    risk_level: high              # high = requires CEO budget approval
+    rate_limit_per_hour: 100
+    requires_secrets:
+      - GOOGLE_ADS_DEVELOPER_TOKEN
+      - GOOGLE_ADS_CLIENT_ID
+      - GOOGLE_ADS_CLIENT_SECRET
+
+  - id: resend_email_api
+    display_name: "Resend Email API"
+    risk_level: medium
+    rate_limit_per_hour: 200
+    requires_secrets:
+      - RESEND_API_KEY
+
+  - id: shopify_admin_api
+    display_name: "Shopify Admin API"
+    risk_level: high
+    rate_limit_per_hour: 50
+    requires_secrets:
+      - SHOPIFY_ADMIN_API_KEY
+
+  - id: github_api
+    display_name: "GitHub API"
+    risk_level: medium
+    rate_limit_per_hour: 300
+    requires_secrets:
+      - GITHUB_TOKEN
+
+  - id: stripe_api
+    display_name: "Stripe API"
+    risk_level: critical          # critical = CEO + Chairman approval
+    rate_limit_per_hour: 50
+    requires_secrets:
+      - STRIPE_SECRET_KEY
+
+  - id: posthog_analytics
+    display_name: "PostHog Analytics"
+    risk_level: low
+    rate_limit_per_hour: 500
+    requires_secrets:
+      - POSTHOG_API_KEY
+
+  - id: figma_api
+    display_name: "Figma API"
+    risk_level: low
+    rate_limit_per_hour: 100
+    requires_secrets: []
+
+  - id: web_scraper
+    display_name: "Headless Web Scraper"
+    risk_level: medium
+    rate_limit_per_hour: 50
+    requires_secrets: []
+
+  - id: playwright_browser
+    display_name: "Playwright Browser Testing"
+    risk_level: low
+    rate_limit_per_hour: 100
+    requires_secrets: []
+
+  - id: lighthouse_api
+    display_name: "Lighthouse Performance Audit"
+    risk_level: low
+    rate_limit_per_hour: 20
+    requires_secrets: []
+
+  - id: vercel_api
+    display_name: "Vercel Deployment API"
+    risk_level: high
+    rate_limit_per_hour: 10
+    requires_secrets: []
+
+  - id: google_trends_api
+    display_name: "Google Trends API"
+    risk_level: low
+    rate_limit_per_hour: 100
+    requires_secrets: []
+
+  - id: tiktok_ads_api
+    display_name: "TikTok Ads API"
+    risk_level: high
+    rate_limit_per_hour: 100
+    requires_secrets: []
+
+# ── Access Policies ──
+# Maps department names to their allowed tool IDs.
+# If an agent requests a tool not in its department's list,
+# the Controller BLOCKS the request and logs a violation.
+
+department_access:
+
+  growth_marketing:
+    allowed_tools:
+      - google_ads_api
+      - resend_email_api
+      - posthog_analytics
+      - web_scraper
+    blocked_tools_reason: "Marketing agents cannot deploy code or access payment systems."
+
+  product_engineering:
+    allowed_tools:
+      - github_api
+      - shopify_admin_api
+      - figma_api
+      - vercel_api
+    blocked_tools_reason: "Product agents cannot run ad campaigns or access analytics directly."
+
+  quality_assurance:
+    allowed_tools:
+      - playwright_browser
+      - lighthouse_api
+      - github_api
+    blocked_tools_reason: "QA agents can only test and report. No deployment or marketing access."
+
+  business_strategy:
+    allowed_tools:
+      - stripe_api
+      - posthog_analytics
+      - web_scraper
+      - google_trends_api
+    blocked_tools_reason: "Strategy agents observe and analyze. No deployment or outbound comms."
+
+# ── CEO Access ──
+# The AI CEO has read access to ALL tools for observability,
+# but write access only through delegating to departments.
+
+ceo_access:
+  read_all_tools: true
+  direct_write_tools: []
+  can_override_rbac: true           # For emergency interventions only

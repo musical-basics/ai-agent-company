@@ -1,0 +1,41 @@
+# ══════════════════════════════════════════════════════════════════
+#  VARIANT A — "The Gen-Z Gamified Swarm"
+#  Overrides the base swarm-compose.yml for A/B testing.
+# ══════════════════════════════════════════════════════════════════
+
+extends: "../swarm-compose.yml"
+
+meta:
+  company_name: "PianoQuest (Variant A)"
+  company_type: e-course
+  seed_budget_usd: 500
+
+overrides:
+
+  departments:
+    growth_marketing:
+      agents:
+        - id: tiktok_specialist
+          role: "TikTok Growth Hacker"
+          sop_file: "tiktok_viral_playbook.md"
+      tools_granted:
+        - tiktok_ads_api
+        - resend_email_api
+        - posthog_analytics
+      budget_allocation_usd: 250
+
+    product_engineering:
+      agents:
+        - id: mobile_dev
+          role: "Mobile-First Developer"
+          sop_file: "gamification_ux.md"
+      tools_granted:
+        - github_api
+        - vercel_api
+      budget_allocation_usd: 200
+
+  strategy:
+    target_demographic: "Gen-Z beginners (16-24)"
+    pricing_model: "$19/mo subscription"
+    ux_philosophy: "Gamified streaks, swipe-based lessons, 15-second video chunks"
+    content_strategy: "Chop raw footage into TikTok-native vertical clips"

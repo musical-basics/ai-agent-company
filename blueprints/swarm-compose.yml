@@ -1,0 +1,262 @@
+# ══════════════════════════════════════════════════════════════════
+#  SWARM-COMPOSE.YML — The Conglomerate Engine
+#  "Docker Compose for Human Capital"
+#
+#  This master configuration defines the anatomy of a synthetic
+#  company: its departments, agent roster, tool permissions,
+#  inter-departmental SLAs, and budget allocations.
+#
+#  Clone this file to blueprints/variants/ to create A/B test
+#  variants of your corporate structure.
+# ══════════════════════════════════════════════════════════════════
+
+meta:
+  version: "1.0.0"
+  company_name: "{{company_name}}"
+  company_type: "{{company_type}}"          # e-course | saas | d2c | media | coaching
+  seed_budget_usd: 5000
+  infrastructure:
+    hard_db: supabase
+    compute: railway
+    soft_db: github
+
+# ──────────────────────────────────────────────────────────────────
+#  THE CEO (Apex Reasoning Agent)
+# ──────────────────────────────────────────────────────────────────
+
+ceo:
+  model_provider: "{{CEO_MODEL_PROVIDER}}"
+  model_name: "{{CEO_MODEL_NAME}}"
+  scope_governance:
+    max_phase_count: 5
+    budget_alert_threshold_pct: 75
+    over_engineering_keywords:
+      - "custom server"
+      - "from scratch"
+      - "proprietary protocol"
+    under_engineering_keywords:
+      - "one-off fix"
+      - "hardcode"
+      - "skip testing"
+  directives_file: "minds/global/chairman_directives.md"
+  culture_file: "minds/global/company_culture.md"
+
+# ──────────────────────────────────────────────────────────────────
+#  DEPARTMENTS (Isolated Silos)
+#  Each department gets:
+#    - Its own Soft DB directory (Git)
+#    - Its own pgvector namespace (Hard DB)
+#    - A scoped set of API tools (RBAC)
+#    - A Manager Subagent for SOP evolution
+# ──────────────────────────────────────────────────────────────────
+
+departments:
+
+  - name: growth_marketing
+    description: "Acquires customers via paid ads, email campaigns, and content marketing."
+    git_mind_directory: "minds/departments/growth_marketing/"
+    pgvector_namespace: "ns_growth_marketing"
+    
+    agents:
+      - id: media_buyer
+        role: "Digital Media Buyer"
+        model_provider: "{{WORKER_MODEL_PROVIDER}}"
+        model_name: "{{WORKER_MODEL_NAME}}"
+        sop_file: "campaign_operations.md"
+        
+      - id: copywriter
+        role: "Performance Copywriter"
+        model_provider: "{{WORKER_MODEL_PROVIDER}}"
+        model_name: "{{WORKER_MODEL_NAME}}"
+        sop_file: "ad_copy_guidelines.md"
+
+      - id: email_marketer
+        role: "Email Campaign Operator"
+        model_provider: "{{WORKER_MODEL_PROVIDER}}"
+        model_name: "{{WORKER_MODEL_NAME}}"
+        sop_file: "email_sequences.md"
+
+    manager:
+      model_provider: "{{MANAGER_MODEL_PROVIDER}}"
+      model_name: "{{MANAGER_MODEL_NAME}}"
+    
+    tools_granted:                         # RBAC — only these tools are accessible
+      - google_ads_api
+      - resend_email_api
+      - posthog_analytics
+      - web_scraper
+
+    budget_allocation_usd: 1500
+
+  - name: product_engineering
+    description: "Builds and maintains the product: website, app, checkout, UX."
+    git_mind_directory: "minds/departments/product_engineering/"
+    pgvector_namespace: "ns_product_engineering"
+    
+    agents:
+      - id: frontend_dev
+        role: "Frontend Developer"
+        model_provider: "{{WORKER_MODEL_PROVIDER}}"
+        model_name: "{{WORKER_MODEL_NAME}}"
+        sop_file: "frontend_standards.md"
+        
+      - id: shopify_dev
+        role: "E-Commerce Developer"
+        model_provider: "{{WORKER_MODEL_PROVIDER}}"
+        model_name: "{{WORKER_MODEL_NAME}}"
+        sop_file: "shopify_operations.md"
+
+      - id: ux_designer
+        role: "UX/UI Designer"
+        model_provider: "{{WORKER_MODEL_PROVIDER}}"
+        model_name: "{{WORKER_MODEL_NAME}}"
+        sop_file: "design_system.md"
+
+    manager:
+      model_provider: "{{MANAGER_MODEL_PROVIDER}}"
+      model_name: "{{MANAGER_MODEL_NAME}}"
+
+    tools_granted:
+      - github_api
+      - shopify_admin_api
+      - figma_api
+      - vercel_api
+
+    budget_allocation_usd: 1500
+
+  - name: quality_assurance
+    description: "Tests all outputs before they reach production. The adversarial gatekeeper."
+    git_mind_directory: "minds/departments/quality_assurance/"
+    pgvector_namespace: "ns_quality_assurance"
+    
+    agents:
+      - id: qa_analyst
+        role: "QA Analyst"
+        model_provider: "{{WORKER_MODEL_PROVIDER}}"
+        model_name: "{{WORKER_MODEL_NAME}}"
+        sop_file: "testing_protocols.md"
+
+    manager:
+      model_provider: "{{MANAGER_MODEL_PROVIDER}}"
+      model_name: "{{MANAGER_MODEL_NAME}}"
+
+    tools_granted:
+      - playwright_browser
+      - lighthouse_api
+      - github_api
+
+    budget_allocation_usd: 500
+
+  - name: business_strategy
+    description: "Analyzes market data, tracks KPIs, and produces executive briefings."
+    git_mind_directory: "minds/departments/business_strategy/"
+    pgvector_namespace: "ns_business_strategy"
+    
+    agents:
+      - id: data_analyst
+        role: "Business Data Analyst"
+        model_provider: "{{WORKER_MODEL_PROVIDER}}"
+        model_name: "{{WORKER_MODEL_NAME}}"
+        sop_file: "analytics_methodology.md"
+
+      - id: strategist
+        role: "Market Strategist"
+        model_provider: "{{WORKER_MODEL_PROVIDER}}"
+        model_name: "{{WORKER_MODEL_NAME}}"
+        sop_file: "competitive_analysis.md"
+
+    manager:
+      model_provider: "{{MANAGER_MODEL_PROVIDER}}"
+      model_name: "{{MANAGER_MODEL_NAME}}"
+
+    tools_granted:
+      - stripe_api
+      - posthog_analytics
+      - web_scraper
+      - google_trends_api
+
+    budget_allocation_usd: 500
+
+# ──────────────────────────────────────────────────────────────────
+#  INTER-DEPARTMENTAL SLAs (The Treaties)
+#  Strict contracts governing how departments hand off artifacts.
+#  If an artifact doesn't match the consumer's schema, it is
+#  REJECTED and a friction event is escalated to the CEO.
+# ──────────────────────────────────────────────────────────────────
+
+inter_departmental_slas:
+
+  - id: marketing_to_product
+    producer: growth_marketing
+    consumer: product_engineering
+    protocol_file: "minds/templates/sla_marketing_to_product.md"
+    required_artifact_keys:
+      - target_audience
+      - core_metric
+      - copy_text
+      - style_details
+      - feature_list
+    rejection_policy:
+      max_retries: 3
+      escalate_to_ceo_after: 2
+
+  - id: product_to_qa
+    producer: product_engineering
+    consumer: quality_assurance
+    protocol_file: "minds/templates/sla_product_to_qa.md"
+    required_artifact_keys:
+      - deployment_url
+      - feature_checklist
+      - acceptance_criteria
+    rejection_policy:
+      max_retries: 2
+      escalate_to_ceo_after: 1
+
+  - id: strategy_to_marketing
+    producer: business_strategy
+    consumer: growth_marketing
+    protocol_file: "minds/templates/sla_strategy_to_marketing.md"
+    required_artifact_keys:
+      - market_analysis_summary
+      - recommended_demographics
+      - budget_reallocation
+      - competitive_positioning
+    rejection_policy:
+      max_retries: 2
+      escalate_to_ceo_after: 2
+
+  - id: qa_to_product
+    producer: quality_assurance
+    consumer: product_engineering
+    protocol_file: "minds/templates/sla_qa_to_product.md"
+    required_artifact_keys:
+      - bug_report
+      - severity_level
+      - reproduction_steps
+      - screenshot_urls
+    rejection_policy:
+      max_retries: 1
+      escalate_to_ceo_after: 1
+
+# ──────────────────────────────────────────────────────────────────
+#  CONGLOMERATE (Multi-Variant Configuration)
+#  Used when running parallel A/B corporate tests.
+# ──────────────────────────────────────────────────────────────────
+
+conglomerate:
+  enabled: false
+  variant_directory: "blueprints/variants/"
+  max_parallel_variants: 10
+  harvest_interval_days: 14
+  merge_policy:
+    strategy: "cherry_pick_best"           # cherry_pick_best | full_merge | manual
+    fitness_metrics:
+      - metric: customer_acquisition_cost
+        weight: 0.3
+        direction: minimize
+      - metric: day7_retention_rate
+        weight: 0.4
+        direction: maximize
+      - metric: bug_report_rate
+        weight: 0.3
+        direction: minimize

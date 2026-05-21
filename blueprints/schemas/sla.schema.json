@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Inter-Departmental SLA",
+  "description": "Schema for validating SLA definitions between departments",
+  "type": "object",
+  "required": ["id", "producer", "consumer", "required_artifact_keys", "rejection_policy"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z_]+$"
+    },
+    "producer": {
+      "type": "string",
+      "description": "Department name producing the artifact"
+    },
+    "consumer": {
+      "type": "string",
+      "description": "Department name consuming the artifact"
+    },
+    "protocol_file": {
+      "type": "string",
+      "pattern": "\\.md$"
+    },
+    "required_artifact_keys": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Keys that MUST be present in the artifact payload for acceptance"
+    },
+    "rejection_policy": {
+      "type": "object",
+      "required": ["max_retries", "escalate_to_ceo_after"],
+      "properties": {
+        "max_retries": { "type": "integer", "minimum": 0 },
+        "escalate_to_ceo_after": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

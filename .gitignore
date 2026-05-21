@@ -1,0 +1,43 @@
+# ── Python ──
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+.venv/
+env/
+
+# ── Node ──
+node_modules/
+.next/
+.nuxt/
+
+# ── Environment ──
+.env
+.env.local
+.env.*.local
+
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# ── Repomix ──
+repomix-output.*
+repomix-*.xml
+!repomix.config.json
+
+# ── Runtime ──
+*.log
+*.pid
+tmp/
+.cache/
+
+# ── Backup files ──
+_backup_files/
