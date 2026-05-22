@@ -7,7 +7,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import {
   ReactFlow,
-  ReactFlowProvider,
   Background,
   Controls,
   MiniMap,
@@ -36,16 +35,21 @@ import { generateNodeId } from '@/lib/utils';
 // appear and calls fitView() to bring them into view.
 
 function FitViewOnLoad({ nodeCount }: { nodeCount: number }) {
-  const { fitView } = useReactFlow();
+  const { fitView, getNodes } = useReactFlow();
   const hasFit = useRef(false);
 
   useEffect(() => {
+    console.log('[FitViewOnLoad] nodeCount changed:', nodeCount, '| hasFit:', hasFit.current);
     if (nodeCount > 0 && !hasFit.current) {
       hasFit.current = true;
-      // Slight delay to let React Flow render the nodes before fitting
-      setTimeout(() => fitView({ padding: 0.2, duration: 400 }), 50);
+      console.log('[FitViewOnLoad] Scheduling fitView in 50ms...');
+      setTimeout(() => {
+        const internalNodes = getNodes();
+        console.log('[FitViewOnLoad] fitView firing — internal RF nodes:', internalNodes.length, internalNodes.map(n => ({ id: n.id, pos: n.position })));
+        fitView({ padding: 0.2, duration: 400 });
+      }, 50);
     }
-  }, [nodeCount, fitView]);
+  }, [nodeCount, fitView, getNodes]);
 
   return null;
 }
@@ -75,6 +79,12 @@ export default function CanvasBuilder() {
     openSLAModal, addEdge: storeAddEdge, updateEdgeData,
     addNode,
   } = useSwarmStore();
+
+  // VERBOSE DIAGNOSTIC
+  console.log('[CanvasBuilder] render — store nodes:', nodes.length, '| edges:', edges.length);
+  if (nodes.length > 0) {
+    console.log('[CanvasBuilder] first node:', JSON.stringify(nodes[0]));
+  }
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
@@ -230,8 +240,7 @@ export default function CanvasBuilder() {
   );
 
   return (
-    <ReactFlowProvider>
-    <div ref={reactFlowWrapper} style={{ flex: 1, height: '100%', position: 'relative' }}>
+    <div ref={reactFlowWrapper} style={{ flex: 1, height: '100%', position: 'relative', minHeight: 0 }}>
       <ReactFlow
         nodes={rfNodes}
         edges={rfEdges}
@@ -305,6 +314,5 @@ export default function CanvasBuilder() {
         </div>
       )}
     </div>
-    </ReactFlowProvider>
   );
 }
