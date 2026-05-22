@@ -80,12 +80,6 @@ export default function CanvasBuilder() {
     addNode,
   } = useSwarmStore();
 
-  // VERBOSE DIAGNOSTIC
-  console.log('[CanvasBuilder] render — store nodes:', nodes.length, '| edges:', edges.length);
-  if (nodes.length > 0) {
-    console.log('[CanvasBuilder] first node:', JSON.stringify(nodes[0]));
-  }
-
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   // Convert store nodes to React Flow nodes
@@ -120,10 +114,27 @@ export default function CanvasBuilder() {
     };
   });
 
-  // ── Node changes (move, resize, select) ────────────────────────────────────
+  // ── Node changes (move, select, delete) ──────────────────────────────────
+  // IMPORTANT: Do NOT include rfNodes in dependency array — that causes an
+  // infinite loop (rfNodes is a new array every render → onNodesChange fires
+  // → setNodes → re-render → new rfNodes → ...). Use getState() for stable access.
+  // Also filter out 'dimensions' changes — React Flow fires these when it measures
+  // node sizes and they must NOT be persisted to Zustand.
   const onNodesChange: OnNodesChange = useCallback(
     (changes) => {
-      const updated = applyNodeChanges(changes, rfNodes) as Node[];
+      // Ignore dimension-measurement events — they only exist inside React Flow
+      const relevant = changes.filter((c) => c.type !== 'dimensions');
+      if (relevant.length === 0) return;
+
+      const { nodes: current } = useSwarmStore.getState();
+      const snapshot: Node[] = current.map((n) => ({
+        id: n.id,
+        type: n.type,
+        position: n.position,
+        data: n.data as unknown as Record<string, unknown>,
+        selected: n.selected,
+      }));
+      const updated = applyNodeChanges(relevant, snapshot) as Node[];
       setNodes(
         updated.map((n) => ({
           id: n.id,
@@ -134,13 +145,21 @@ export default function CanvasBuilder() {
         }))
       );
     },
-    [rfNodes, setNodes]
+    [setNodes] // ← stable: no rfNodes dependency
   );
 
   // ── Edge changes (delete) ─────────────────────────────────────────────────
+  // Same pattern: use getState() to avoid rfEdges in dependency array.
   const onEdgesChange: OnEdgesChange = useCallback(
     (changes) => {
-      const updated = applyEdgeChanges(changes, rfEdges) as Edge[];
+      const { edges: current } = useSwarmStore.getState();
+      const snapshot: Edge[] = current.map((e) => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        data: e.data as unknown as Record<string, unknown>,
+      }));
+      const updated = applyEdgeChanges(changes, snapshot) as Edge[];
       setEdges(
         updated.map((e) => ({
           id: e.id,
@@ -150,7 +169,7 @@ export default function CanvasBuilder() {
         }))
       );
     },
-    [rfEdges, setEdges]
+    [setEdges] // ← stable: no rfEdges dependency
   );
 
   // ── Connect (draw edge) → open SLA modal ──────────────────────────────────
@@ -239,23 +258,8 @@ export default function CanvasBuilder() {
     [addNode, selectNode]
   );
 
-  // DEBUG: measure wrapper dimensions on render
-  const wrapperDims = reactFlowWrapper.current
-    ? { w: reactFlowWrapper.current.offsetWidth, h: reactFlowWrapper.current.offsetHeight }
-    : { w: 'n/a', h: 'n/a' };
-
   return (
     <div ref={reactFlowWrapper} style={{ position: 'absolute', inset: 0 }}>
-      {/* ── TEMPORARY DEBUG BANNER ─────────────────────────────────────────── */}
-      <div style={{
-        position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)',
-        zIndex: 9999, background: '#f43f5e', color: '#fff', padding: '6px 14px',
-        borderRadius: 8, fontSize: 12, fontWeight: 700, fontFamily: 'monospace',
-        boxShadow: '0 4px 20px rgba(244,63,94,0.5)', pointerEvents: 'none',
-      }}>
-        🔍 DEBUG | store.nodes: {nodes.length} | rfNodes: {rfNodes.length} | wrapper: {String(wrapperDims.w)}×{String(wrapperDims.h)}px
-      </div>
-      {/* ─────────────────────────────────────────────────────────────────────── */}
       <ReactFlow
         nodes={rfNodes}
         edges={rfEdges}
