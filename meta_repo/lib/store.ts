@@ -14,6 +14,7 @@ import type {
   ModelOption,
 } from './types';
 import { DEFAULT_MODELS } from './registry';
+import { PRESET_BLUEPRINTS } from './preset-blueprints';
 
 // ─── Inspector State ──────────────────────────────────────────────────────────
 
@@ -224,7 +225,8 @@ export const useSwarmStore = create<SwarmForgeStore>()(
         set((s) => ({ deploy: { ...s.deploy, status: 'error', error } })),
 
       // ── Blueprint Library ─────────────────────────────────────────
-      library: { isOpen: false, blueprints: [] },
+      // Presets are always merged in at store init; user blueprints come after.
+      library: { isOpen: false, blueprints: PRESET_BLUEPRINTS },
 
       openLibrary: () => set((s) => ({ library: { ...s.library, isOpen: true } })),
       closeLibrary: () => set((s) => ({ library: { ...s.library, isOpen: false } })),
@@ -295,6 +297,23 @@ export const useSwarmStore = create<SwarmForgeStore>()(
         companyType: s.companyType,
         seedBudgetUsd: s.seedBudgetUsd,
       }),
+      // When restoring from localStorage, always ensure presets are present.
+      // User-saved blueprints come AFTER presets (presets are pinned to top).
+      merge: (persisted: unknown, current) => {
+        const p = persisted as Partial<typeof current>;
+        const userBlueprints = (p.library?.blueprints ?? []).filter(
+          (b) => !b.id.startsWith('preset_')
+        );
+        return {
+          ...current,
+          ...p,
+          library: {
+            isOpen: false,
+            blueprints: [...PRESET_BLUEPRINTS, ...userBlueprints],
+          },
+        };
+      },
     }
   )
 );
+

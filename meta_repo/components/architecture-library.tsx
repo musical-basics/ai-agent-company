@@ -20,6 +20,7 @@ export default function ArchitectureLibrary() {
   const [saveBudget, setSaveBudget] = useState(seedBudgetUsd);
   const [saveTags, setSaveTags] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
   const handleSave = () => {
     if (!saveName.trim()) return;
@@ -92,7 +93,24 @@ export default function ArchitectureLibrary() {
           {/* ── Browse Tab ── */}
           {view === 'browse' && (
             <>
-              {library.blueprints.length === 0 ? (
+              {/* Search */}
+              <div style={{ marginBottom: 14 }}>
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search blueprints…"
+                  style={{
+                    width: '100%', padding: '7px 10px',
+                    background: '#080b14', border: '1px solid #1e2a40',
+                    borderRadius: 7, color: '#e8eef8', fontSize: 11, outline: 'none',
+                  }}
+                  onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = '#6366f1'; }}
+                  onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = '#1e2a40'; }}
+                />
+              </div>
+              {library.blueprints.filter(bp =>
+                !search || bp.name.toLowerCase().includes(search.toLowerCase()) || bp.tags?.some(t => t.includes(search.toLowerCase()))
+              ).length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '48px 24px', color: '#2d4060' }}>
                   <BookOpen size={32} style={{ opacity: 0.3, margin: '0 auto 12px' }} />
                   <p style={{ fontSize: 13, fontWeight: 600, color: '#4a6080', margin: '0 0 8px' }}>No blueprints saved yet</p>
@@ -102,12 +120,17 @@ export default function ArchitectureLibrary() {
                 </div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  {library.blueprints.map((bp) => (
+                  {library.blueprints.filter(bp =>
+                    !search || bp.name.toLowerCase().includes(search.toLowerCase()) || bp.tags?.some(t => t.includes(search.toLowerCase()))
+                  ).map((bp) => {
+                    const isPreset = bp.id.startsWith('preset_');
+                    return (
                     <div
                       key={bp.id}
                       style={{
-                        background: '#080b14',
-                        border: '1px solid #1e2a40',
+                        background: isPreset ? '#080d18' : '#080b14',
+                        border: `1px solid ${isPreset ? '#1e3050' : '#1e2a40'}`,
+                        borderTop: isPreset ? '2px solid #6366f1' : `1px solid #1e2a40`,
                         borderRadius: 12,
                         padding: '14px',
                         position: 'relative',
@@ -115,8 +138,19 @@ export default function ArchitectureLibrary() {
                         cursor: 'pointer',
                       }}
                       onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = '#6366f1'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = '#1e2a40'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = isPreset ? '#1e3050' : '#1e2a40'; }}
                     >
+                      {/* Preset badge */}
+                      {isPreset && (
+                        <div style={{
+                          position: 'absolute', top: 10, right: 10,
+                          fontSize: 8, fontWeight: 800, letterSpacing: '0.08em',
+                          background: '#1e1b4b', color: '#818cf8',
+                          padding: '2px 6px', borderRadius: 4,
+                        }}>
+                          PRESET
+                        </div>
+                      )}
                       {/* Company type badge */}
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
                         <div style={{ width: 32, height: 32, borderRadius: 8, background: '#1e1b4b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#818cf8', flexShrink: 0 }}>
@@ -130,7 +164,7 @@ export default function ArchitectureLibrary() {
 
                       {bp.description && (
                         <p style={{ fontSize: 10, color: '#4a6080', margin: '0 0 10px', lineHeight: 1.4 }}>
-                          {bp.description.slice(0, 80)}{bp.description.length > 80 ? '…' : ''}
+                          {bp.description!.slice(0, 100)}{bp.description!.length > 100 ? '…' : ''}
                         </p>
                       )}
 
@@ -188,7 +222,7 @@ export default function ArchitectureLibrary() {
                         >
                           <Download size={11} /> Load
                         </button>
-                        {confirmDelete === bp.id ? (
+                        {!isPreset && (confirmDelete === bp.id ? (
                           <button
                             onClick={() => { deleteBlueprint(bp.id); setConfirmDelete(null); }}
                             style={{
@@ -208,10 +242,10 @@ export default function ArchitectureLibrary() {
                           >
                             <Trash2 size={12} />
                           </button>
-                        )}
+                        ))}
                       </div>
-                    </div>
-                  ))}
+                    </div>);
+                  })}
                 </div>
               )}
             </>
