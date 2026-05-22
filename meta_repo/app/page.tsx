@@ -210,12 +210,14 @@ export default function SwarmForgePage() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       <TopBar />
 
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
         {/* Left: Palette */}
         <PaletteSidebar />
 
-        {/* Center: Canvas */}
-        <CanvasBuilder />
+        {/* Center: Canvas — explicit wrapper so dynamic import always has a measured container */}
+        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', minHeight: 0, minWidth: 0 }}>
+          <CanvasBuilder />
+        </div>
 
         {/* Right: Inspector (conditionally shown) */}
         {inspector.isOpen && inspector.selectedNodeId && (

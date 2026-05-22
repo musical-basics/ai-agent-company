@@ -239,8 +239,23 @@ export default function CanvasBuilder() {
     [addNode, selectNode]
   );
 
+  // DEBUG: measure wrapper dimensions on render
+  const wrapperDims = reactFlowWrapper.current
+    ? { w: reactFlowWrapper.current.offsetWidth, h: reactFlowWrapper.current.offsetHeight }
+    : { w: 'n/a', h: 'n/a' };
+
   return (
-    <div ref={reactFlowWrapper} style={{ flex: 1, height: '100%', position: 'relative', minHeight: 0 }}>
+    <div ref={reactFlowWrapper} style={{ position: 'absolute', inset: 0 }}>
+      {/* ── TEMPORARY DEBUG BANNER ─────────────────────────────────────────── */}
+      <div style={{
+        position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 9999, background: '#f43f5e', color: '#fff', padding: '6px 14px',
+        borderRadius: 8, fontSize: 12, fontWeight: 700, fontFamily: 'monospace',
+        boxShadow: '0 4px 20px rgba(244,63,94,0.5)', pointerEvents: 'none',
+      }}>
+        🔍 DEBUG | store.nodes: {nodes.length} | rfNodes: {rfNodes.length} | wrapper: {String(wrapperDims.w)}×{String(wrapperDims.h)}px
+      </div>
+      {/* ─────────────────────────────────────────────────────────────────────── */}
       <ReactFlow
         nodes={rfNodes}
         edges={rfEdges}
