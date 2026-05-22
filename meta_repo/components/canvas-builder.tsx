@@ -4,19 +4,20 @@
  * The main React Flow DAG workspace.
  */
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   ReactFlow,
+  ReactFlowProvider,
   Background,
   Controls,
   MiniMap,
   BackgroundVariant,
+  useReactFlow,
   type OnConnect,
   type OnNodesChange,
   type OnEdgesChange,
   applyNodeChanges,
   applyEdgeChanges,
-  addEdge,
   type Node,
   type Edge,
   type Connection,
@@ -28,6 +29,26 @@ import { useSwarmStore } from '@/lib/store';
 import { NODE_TYPES } from './canvas-nodes';
 import type { CanvasNode, CanvasEdge, PaletteItem, SwarmNodeData } from '@/lib/types';
 import { generateNodeId } from '@/lib/utils';
+
+// ─── Fit View After Rehydration ───────────────────────────────────────────────
+// Zustand persist rehydrates AFTER React Flow mounts, so fitView runs on an
+// empty canvas the first time. This component detects the first time nodes
+// appear and calls fitView() to bring them into view.
+
+function FitViewOnLoad({ nodeCount }: { nodeCount: number }) {
+  const { fitView } = useReactFlow();
+  const hasFit = useRef(false);
+
+  useEffect(() => {
+    if (nodeCount > 0 && !hasFit.current) {
+      hasFit.current = true;
+      // Slight delay to let React Flow render the nodes before fitting
+      setTimeout(() => fitView({ padding: 0.2, duration: 400 }), 50);
+    }
+  }, [nodeCount, fitView]);
+
+  return null;
+}
 
 // ─── Edge style factory ────────────────────────────────────────────────────────
 
@@ -209,6 +230,7 @@ export default function CanvasBuilder() {
   );
 
   return (
+    <ReactFlowProvider>
     <div ref={reactFlowWrapper} style={{ flex: 1, height: '100%', position: 'relative' }}>
       <ReactFlow
         nodes={rfNodes}
@@ -223,16 +245,16 @@ export default function CanvasBuilder() {
         onDrop={onDrop}
         onDragOver={onDragOver}
         nodeTypes={NODE_TYPES}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
         defaultEdgeOptions={{ type: 'smoothstep' }}
         proOptions={{ hideAttribution: true }}
-        style={{ background: 'var(--bg-base)' }}
+        style={{ background: 'var(--bg-base)', width: '100%', height: '100%' }}
         deleteKeyCode="Delete"
         multiSelectionKeyCode="Shift"
         minZoom={0.2}
         maxZoom={2}
       >
+        {/* Re-fit after Zustand persist rehydration (nodes arrive after mount) */}
+        <FitViewOnLoad nodeCount={nodes.length} />
         <Background
           variant={BackgroundVariant.Dots}
           gap={24}
@@ -283,5 +305,6 @@ export default function CanvasBuilder() {
         </div>
       )}
     </div>
+    </ReactFlowProvider>
   );
 }
