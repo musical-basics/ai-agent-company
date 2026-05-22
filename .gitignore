@@ -29,9 +29,10 @@ node_modules/
 .DS_Store
 
 # ── Repomix ──
-repomix-output.*
-repomix-*.xml
+*repomix*
 !repomix.config.json
+!repomix.config.*
+
 
 # ── Runtime ──
 *.log
